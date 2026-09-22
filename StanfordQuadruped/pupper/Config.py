@@ -6,9 +6,10 @@ from enum import Enum
 # TODO: put these somewhere else
 class PWMParams:
     def __init__(self):
-        self.pins = np.array([[2, 14, 18, 23], [3, 15, 27, 24], [4, 17, 22, 25]])
-        self.range = 4000
-        self.freq = 250
+        # PCA9685 Channels: 3 rows (Abduction, Inner Hip, Outer Hip) x 4 columns (FR, FL, BR, BL)
+        self.pins = np.array([[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]])
+        self.range = 65535
+        self.freq = 50
 
 
 class ServoParams:

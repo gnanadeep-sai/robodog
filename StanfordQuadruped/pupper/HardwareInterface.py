@@ -1,19 +1,25 @@
-import pigpio
+import board
+import busio
+from adafruit_pca9685 import PCA9685
 from pupper.Config import ServoParams, PWMParams
 
 
 class HardwareInterface:
     def __init__(self):
-        self.pi = pigpio.pi()
         self.pwm_params = PWMParams()
         self.servo_params = ServoParams()
-        initialize_pwm(self.pi, self.pwm_params)
+        
+        i2c = busio.I2C(board.SCL, board.SDA)
+        self.pca = PCA9685(i2c)
+        self.pca.frequency = self.pwm_params.freq
+        
+        initialize_pwm(self.pca, self.pwm_params)
 
     def set_actuator_postions(self, joint_angles):
-        send_servo_commands(self.pi, self.pwm_params, self.servo_params, joint_angles)
+        send_servo_commands(self.pca, self.pwm_params, self.servo_params, joint_angles)
     
     def set_actuator_position(self, joint_angle, axis, leg):
-        send_servo_command(self.pi, self.pwm_params, self.servo_params, joint_angle, axis, leg)
+        send_servo_command(self.pca, self.pwm_params, self.servo_params, joint_angle, axis, leg)
 
 
 def pwm_to_duty_cycle(pulsewidth_micros, pwm_params):
@@ -28,7 +34,7 @@ def pwm_to_duty_cycle(pulsewidth_micros, pwm_params):
 
     Returns
     -------
-    float
+    int
         PWM duty cycle corresponding to the pulse width
     """
     return int(pulsewidth_micros / 1e6 * pwm_params.freq * pwm_params.range)
@@ -69,16 +75,16 @@ def angle_to_duty_cycle(angle, pwm_params, servo_params, axis_index, leg_index):
     )
 
 
-def initialize_pwm(pi, pwm_params):
+def initialize_pwm(pca, pwm_params):
+    # PCA9685 frequency is set globally in __init__
+    # We can optionally set all duty cycles to 0 here to ensure they are off initially
     for leg_index in range(4):
         for axis_index in range(3):
-            pi.set_PWM_frequency(
-                pwm_params.pins[axis_index, leg_index], pwm_params.freq
-            )
-            pi.set_PWM_range(pwm_params.pins[axis_index, leg_index], pwm_params.range)
+            channel = pwm_params.pins[axis_index, leg_index]
+            pca.channels[channel].duty_cycle = 0
 
 
-def send_servo_commands(pi, pwm_params, servo_params, joint_angles):
+def send_servo_commands(pca, pwm_params, servo_params, joint_angles):
     for leg_index in range(4):
         for axis_index in range(3):
             duty_cycle = angle_to_duty_cycle(
@@ -88,15 +94,18 @@ def send_servo_commands(pi, pwm_params, servo_params, joint_angles):
                 axis_index,
                 leg_index,
             )
-            pi.set_PWM_dutycycle(pwm_params.pins[axis_index, leg_index], duty_cycle)
+            channel = pwm_params.pins[axis_index, leg_index]
+            pca.channels[channel].duty_cycle = duty_cycle
 
 
-def send_servo_command(pi, pwm_params, servo_params, joint_angle, axis, leg):
+def send_servo_command(pca, pwm_params, servo_params, joint_angle, axis, leg):
     duty_cycle = angle_to_duty_cycle(joint_angle, pwm_params, servo_params, axis, leg)
-    pi.set_PWM_dutycycle(pwm_params.pins[axis, leg], duty_cycle)
+    channel = pwm_params.pins[axis, leg]
+    pca.channels[channel].duty_cycle = duty_cycle
 
 
-def deactivate_servos(pi, pwm_params):
+def deactivate_servos(pca, pwm_params):
     for leg_index in range(4):
         for axis_index in range(3):
-            pi.set_PWM_dutycycle(pwm_params.pins[axis_index, leg_index], 0)
+            channel = pwm_params.pins[axis_index, leg_index]
+            pca.channels[channel].duty_cycle = 0
