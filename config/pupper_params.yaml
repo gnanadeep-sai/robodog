@@ -1,0 +1,112 @@
+# Default parameters for robodog_ros2, consolidating the legacy
+# pupper/Config.py, pupper/HardwareConfig.py and
+# pupper/ServoCalibration.py static Python objects into one
+# `ros__parameters` YAML file per the migration blueprint.
+#
+# Values below are the exact legacy defaults. Per-robot calibration
+# (`hardware_node.servo.*`) should be overridden with the output of
+# `ros2 run robodog_ros2 calibration_cli`.
+
+controller_node:
+  ros__parameters:
+    # -------- COMMANDS --------
+    max_x_velocity: 0.4
+    max_y_velocity: 0.3
+    max_yaw_rate: 2.0
+    max_pitch: 0.5235987755982988  # 30 deg, radians
+
+    # -------- MOVEMENT --------
+    z_time_constant: 0.02
+    z_speed: 0.03
+    pitch_deadband: 0.02
+    pitch_time_constant: 0.25
+    max_pitch_rate: 0.15
+    roll_speed: 0.16
+    yaw_time_constant: 0.3
+    max_stance_yaw: 1.2
+    max_stance_yaw_rate: 2.0
+
+    # -------- STANCE --------
+    delta_x: 0.1
+    delta_y: 0.09
+    x_shift: 0.0
+    default_z_ref: -0.16
+
+    # -------- SWING --------
+    z_clearance: 0.07
+    alpha: 0.5
+    beta: 0.5
+
+    # -------- GAIT --------
+    dt: 0.01  # controller timer period (s); 100Hz, deterministic
+    num_phases: 4
+    contact_phases: [
+      1, 1, 1, 0,
+      1, 0, 1, 1,
+      1, 0, 1, 1,
+      1, 1, 1, 0,
+    ]
+    overlap_time: 0.10
+    swing_time: 0.15
+
+    # -------- GEOMETRY --------
+    leg_fb: 0.10
+    leg_lr: 0.04
+    leg_l2: 0.115
+    leg_l1: 0.1235
+    abduction_offset: 0.03
+    foot_radius: 0.01
+    hip_l: 0.0394
+    hip_w: 0.0744
+    hip_t: 0.0214
+    hip_offset: 0.0132
+    body_l: 0.276
+    body_w: 0.100
+    body_t: 0.050
+
+    # -------- INERTIAL --------
+    frame_mass: 0.560
+    module_mass: 0.080
+    leg_mass: 0.030
+
+    # -------- /joy AXIS/BUTTON MAPPING --------
+    # Overrides core/command_interpreter.py::DEFAULT_JOY_MAPPING; edit
+    # here to match whatever gamepad/`joy` driver combination is
+    # actually plugged in, no code changes required.
+    joy_mapping.axis_lx: 0
+    joy_mapping.axis_ly: 1
+    joy_mapping.axis_rx: 3
+    joy_mapping.axis_ry: 4
+    joy_mapping.axis_dpad_x: 6
+    joy_mapping.axis_dpad_y: 7
+    joy_mapping.button_trot: 5   # R1
+    joy_mapping.button_hop: 0    # X / A
+    joy_mapping.button_activate: 4  # L1
+
+hardware_node:
+  ros__parameters:
+    i2c_bus: 1
+    i2c_address: 64  # 0x40
+
+    # 3 rows (abduction, inner hip, outer hip) x 4 columns
+    # (FR, FL, BR, BL), flattened row-major -- matches core/joint_names.py.
+    pwm.pins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    pwm.range: 65535
+    pwm.freq: 50.0
+
+    servo.neutral_position_pwm: 1500.0
+    servo.micros_per_rad: 649.1841  # 11.333 * 180 / pi, legacy default
+
+    # PASTE THE OUTPUT OF `calibration_cli` HERE. Flattened (axis-major,
+    # leg-minor) 3x4 matrix; legacy pupper/ServoCalibration.py defaults
+    # shown below.
+    servo.neutral_angle_degrees: [
+      -11.0, -9.0, -12.0, -9.0,
+       58.0, 48.0,  54.0, 40.0,
+      -45.0, -22.0, -42.0, -38.0,
+    ]
+    servo.servo_multipliers: [
+      1,  1,  1,  1,
+     -1,  1, -1,  1,
+      1, -1,  1, -1,
+    ]

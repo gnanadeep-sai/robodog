@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://download.ros.org/schema/package_format3.xsl"?>
+<package format="3">
+  <name>robodog_ros2</name>
+  <version>0.1.0</version>
+  <description>
+    ROS 2 migration of the legacy StanfordQuadruped/pupper control stack.
+    A single ament_python package, strictly partitioned into core/
+    (pure gait/stance/swing/kinematics/config math, no rclpy), hardware/
+    (pure pigpio PCA9685 transport, no rclpy) and nodes/ (the rclpy
+    wrappers: controller_node and hardware_node).
+  </description>
+  <maintainer email="TODO@example.com">TODO</maintainer>
+  <license>MIT</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>tf2_msgs</exec_depend>
+  <exec_depend>joy</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+
+  <!--
+    transforms3d has no rosdep key on most distros; install it via pip
+    (see requirements.txt / README):
+        pip3 install transforms3d pigpio
+    pigpio is likewise a plain pip/apt dependency (and pigpiod must be
+    running as a system service: `sudo systemctl enable --now pigpiod`),
+    not a rosdep-resolvable ROS package.
+  -->
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

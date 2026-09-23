@@ -1,0 +1,25 @@
+# ROS 2 Workspace Build Artifacts
+build/
+install/
+log/
+
+# Python Cache and Compiled Files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python Distribution / Packaging
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Editor and IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
