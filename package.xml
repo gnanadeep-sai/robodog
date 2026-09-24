@@ -26,7 +26,7 @@
     (see requirements.txt / README):
         pip3 install transforms3d pigpio
     pigpio is likewise a plain pip/apt dependency (and pigpiod must be
-    running as a system service: `sudo systemctl enable --now pigpiod`),
+    running as a system service: `sudo systemctl enable pigpiod`),
     not a rosdep-resolvable ROS package.
   -->
 
