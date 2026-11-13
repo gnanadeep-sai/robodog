@@ -1,0 +1,18 @@
+services:
+  robodog:
+    build: .
+    network_mode: host
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - /dev:/dev
+      - .:/ros2_ws/src/robodog_ros2
+      - ros_build:/ros2_ws/build
+      - ros_install:/ros2_ws/install
+      - ros_log:/ros2_ws/log
+
+volumes:
+  ros_build:
+  ros_install:
+  ros_log:
