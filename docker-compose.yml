@@ -1,0 +1,11 @@
+services:
+  robodog:
+    build: .
+    image: robodog
+    network_mode: host
+    privileged: true
+    volumes:
+      - /dev:/dev
+      - .:/ros2_ws
+    stdin_open: true
+    tty: true
